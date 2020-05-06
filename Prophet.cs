@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using SharpDX;
 using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore;
+using Newtonsoft.Json.Linq;
 
 namespace Prophet
 {
@@ -21,17 +23,21 @@ namespace Prophet
 
         public override bool Initialise()
         {
-            ReadProphecies();
+            // ReadProphecies();
 
+            ParsingPoeNinja();
+            
             _ingameState = GameController.Game.IngameState;
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
+            Settings.League.OnValueSelectedPre += s => { ParsingPoeNinja(); };
+            
             return true;
         }
 
         public override void Render()
         {
-            if (!_ingameState.IngameUi.OpenLeftPanel.IsVisible)
+            if (!_ingameState.IngameUi.OpenRightPanel.IsVisible)
                 return;
 
             GotProphecies();
@@ -41,7 +47,7 @@ namespace Prophet
         private void GotProphecies()
         {
             //
-            var ProphecyPanel = _ingameState.IngameUi.OpenLeftPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(32)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
+            var ProphecyPanel = _ingameState.IngameUi.OpenRightPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(33)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
 
             if ((ProphecyPanel == null) || (!ProphecyPanel.IsVisible)) 
                 return;
@@ -137,6 +143,81 @@ namespace Prophet
             }
         }
 
+        private void ParsingPoeNinja()
+        {
+            PropheciesListGood = new List<string>();
+            
+            PropheciesListTrash = new List<string>();
+            
+            if (!Settings.Update.Value)
+                return;
+
+            #region Parsing
+
+            List<string> uniquesUrls;
+            
+            switch (Settings.League.Value)
+            {
+                case "Temp SC" : 
+                    uniquesUrls = new List<string>()
+                    {
+                        @"https://poe.ninja/api/data/itemoverview?league=Delirium&type=Prophecy&language=en",
+                    };
+                    break;
+                
+                case "Temp HC" : 
+                    uniquesUrls = new List<string>()
+                    {
+                        @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Delirium&type=Prophecy&language=en",
+                    };
+                    break;
+                
+                default:
+                    uniquesUrls = new List<string>();
+                    break;
+            }
+            
+            var resultGood = new HashSet<string>();
+            
+            var resultTrash = new HashSet<string>();
+
+            foreach (var url in uniquesUrls)
+            {
+                using (var wc = new WebClient())
+                {
+                    var json = wc.DownloadString(url);
+                    var o = JObject.Parse(json);
+                    foreach (var line in o?["lines"])
+                    {
+                        if (float.TryParse((string) line?["chaosValue"], out var chaosValue))
+                        {
+                            if (chaosValue >= Settings.ChaosValueGood.Value)
+                            {
+                                resultGood.Add((string) line?["name"]);
+                            }
+                            
+                            if (chaosValue <= Settings.ChaosValueTrash.Value)
+                            {
+                                resultTrash.Add((string) line?["name"]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var result2G = resultGood.ToList();
+            result2G.Sort();
+
+            PropheciesListGood = result2G;
+            
+            var result2T = resultTrash.ToList();
+            result2T.Sort();
+            
+            PropheciesListTrash = result2T;
+
+            #endregion
+        }
+        
         private void CheckConfig(string path)
         {
             if (File.Exists(path)) return;

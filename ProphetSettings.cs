@@ -17,6 +17,23 @@ namespace Prophet
             ColorGood = new ColorBGRA(0, 255, 0, 255);
 
             ColorTrash = new ColorBGRA(0, 0, 255, 255);
+            
+            #region PoeNinjaUnique
+
+            Update = new ToggleNode(false);
+
+            List<string> listLeagues = new List<string>()
+            {
+                "Temp SC", "Temp HC"
+            };
+            League = new ListNode();
+            League.SetListValues(listLeagues);
+
+            ChaosValueGood = new RangeNode<int>(2, 0, 50);
+            
+            ChaosValueTrash = new RangeNode<int>(2, 0, 50);
+            
+            #endregion
         }
 
         [Menu("Menu Settings", 100)]
@@ -31,6 +48,24 @@ namespace Prophet
         [Menu("Color trash prophecy", parentIndex = 100, Tooltip = "Display color of border trash prophecy")]
         public ColorNode ColorTrash { get; set; }
 
+        #region PoeNinja
+
+        [Menu("Parsing Poe Ninja Setting", 99)] 
+        public EmptyNode PoeNinjaUnique { get; set; }
+
+        [Menu("Enable", parentIndex = 99, Tooltip = "Parsing poe ninja for autovendor trash uniques items")]
+        public ToggleNode Update { get; set; }
+        
+        [Menu("League", parentIndex = 99, Tooltip = "Choose league")]
+        public ListNode League { get; set; }
+        
+        [Menu("Chaos", "Set min chaos value for good prophecy")]
+        public RangeNode<int> ChaosValueGood { get; set; }
+        
+        [Menu("Chaos", "Set max chaos value for trash prophecy")]
+        public RangeNode<int> ChaosValueTrash { get; set; }
+        
+        #endregion
 
     }
 }
