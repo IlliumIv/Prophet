@@ -59,13 +59,13 @@ namespace Prophet
         [Menu("League", parentIndex = 99, Tooltip = "Choose league")]
         public ListNode League { get; set; }
         
-        [Menu("Chaos", parentIndex = 99, "Set min chaos value for good prophecy")]
+        [Menu("Chaos", parentIndex = 99, Tooltip = "Set min chaos value for good prophecy")]
         public RangeNode<int> ChaosValueGood { get; set; }
         
-        [Menu("Chaos", parentIndex = 99, "Set max chaos value for trash prophecy")]
+        [Menu("Chaos", parentIndex = 99, Tooltip = "Set max chaos value for trash prophecy")]
         public RangeNode<int> ChaosValueTrash { get; set; }
         
-        [Menu("Refresh Data", parentIndex = 99, "Press to update after configuring chaos values. Do not spam.")]
+        [Menu("Refresh Data", parentIndex = 99, Tooltip = "Press to update after configuring chaos values. Do not spam.")]
         public ButtonNode Refresh { get; set; } = new ButtonNode();
         #endregion
 
