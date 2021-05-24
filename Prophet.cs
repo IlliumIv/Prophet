@@ -151,11 +151,11 @@ namespace Prophet
         }
         
         private string FetchPoeNinjaURL() {
-            return Settings.League.Value switch
+            switch (Settings.League.Value)
             {
-                "Temp SC" => @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
-                "Temp HC" => @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
-                _ => @"",
+                case "Temp SC": return @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en";
+                case "Temp HC": return @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en";
+                default: return "";
             };
          }
 
