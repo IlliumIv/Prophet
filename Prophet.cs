@@ -149,6 +149,15 @@ namespace Prophet
                 reader.Close();
             }
         }
+        
+        private string FetchPoeNinjaURL() {
+            return Settings.League.Value switch
+            {
+                "Temp SC" => @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
+                "Temp HC" => @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
+                _ => @"",
+            };
+         }
 
         private void ParsingPoeNinja()
         {
@@ -156,17 +165,9 @@ namespace Prophet
                 return;
 
             #region Parsing
-            PropheciesListGood = new List<string>();
-            PropheciesListTrash = new List<string>();
-            var uniquesUrl = Settings.League.Value switch 
-            {
-                "Temp SC" -> @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
-                "Temp HC" => @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
-                _ => @"",
-            };
+            string uniquesUrl = FetchPoeNinjaURL();
             
             var resultGood = new HashSet<string>();
-            
             var resultTrash = new HashSet<string>();
 
             using (var wc = new WebClient())
@@ -191,12 +192,10 @@ namespace Prophet
 
             var result2G = resultGood.ToList();
             result2G.Sort();
-
             PropheciesListGood = result2G;
             
             var result2T = resultTrash.ToList();
             result2T.Sort();
-            
             PropheciesListTrash = result2T;
 
             #endregion
