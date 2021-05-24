@@ -20,7 +20,7 @@ namespace Prophet
             
             #region PoeNinjaUnique
 
-            Update = new ToggleNode(false);
+            UseAPI = new ToggleNode(false);
 
             List<string> listLeagues = new List<string>()
             {
@@ -53,8 +53,8 @@ namespace Prophet
         [Menu("Parsing Poe Ninja Setting", 99)] 
         public EmptyNode PoeNinjaUnique { get; set; }
 
-        [Menu("Enable", parentIndex = 99, Tooltip = "Parsing poe ninja for autovendor trash uniques items")]
-        public ToggleNode Update { get; set; }
+        [Menu("Use POE.Ninja", parentIndex = 99, Tooltip = "Parsing poe ninja for autovendor trash uniques items")]
+        public ToggleNode UseAPI { get; set; }
         
         [Menu("League", parentIndex = 99, Tooltip = "Choose league")]
         public ListNode League { get; set; }
@@ -65,7 +65,7 @@ namespace Prophet
         [Menu("Chaos", parentIndex = 99, Tooltip = "Set max chaos value for trash prophecy")]
         public RangeNode<int> ChaosValueTrash { get; set; }
         
-        [Menu("Refresh Data", parentIndex = 99, Tooltip = "Press to update after configuring chaos values. Do not spam.")]
+        [Menu("Refresh Data", parentIndex = 99, Tooltip = "Do not spam. Use after updating Chaos values.")]
         public ButtonNode Refresh { get; set; } = new ButtonNode();
         #endregion
 
