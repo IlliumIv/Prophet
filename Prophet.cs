@@ -165,14 +165,14 @@ namespace Prophet
                 return;
 
             #region Parsing
-            string uniquesUrl = FetchPoeNinjaURL();
+            string apiURL = FetchPoeNinjaURL();
             
             var resultGood = new HashSet<string>();
             var resultTrash = new HashSet<string>();
 
             using (var wc = new WebClient())
             {
-                var json = wc.DownloadString(url);
+                var json = wc.DownloadString(apiURL);
                 var o = JObject.Parse(json);
                 foreach (var line in o?["lines"])
                 {
