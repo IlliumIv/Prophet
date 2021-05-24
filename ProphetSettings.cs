@@ -66,7 +66,7 @@ namespace Prophet
         public RangeNode<int> ChaosValueTrash { get; set; }
         
         [Menu("Refresh Data", parentIndex = 99, "Press to update after configuring chaos values. Do not spam.")]
-        public ButtonNode Refresh { get; set } = new ButtonNode();
+        public ButtonNode Refresh { get; set; } = new ButtonNode();
         #endregion
 
     }
