@@ -23,25 +23,22 @@ namespace Prophet
 
         public override bool Initialise()
         {
+            _ingameState = GameController.Game.IngameState;
+            _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
+
+            RefreshData();
+            Settings.Refresh.OnPressed += s => { RefreshData(); };
+            Settings.League.OnValueSelectedPre += s => { RefreshData(); };
+            return true;
+        }
+        
+        private void RefreshData() {
             if (Settings.Update.Value) {
                 ParsingPoeNinja();
             }
             else {
                 ReadProphecies();
             }
-            
-            _ingameState = GameController.Game.IngameState;
-            _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
-
-            Settings.League.OnValueSelectedPre += s => { 
-                if (Settings.Update.Value) {
-                    ParsingPoeNinja();
-                }
-                else {
-                    ReadProphecies();
-                }
-            };
-            return true;
         }
 
         public override void Render()
