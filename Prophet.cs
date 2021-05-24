@@ -28,7 +28,7 @@ namespace Prophet
 
             RefreshData();
             Settings.Refresh.OnPressed += () => { RefreshData(); };
-            Settings.League.OnValueSelectedPre += () => { RefreshData(); };
+            Settings.League.OnValueSelectedPre += s => { RefreshData(); };
             return true;
         }
         
