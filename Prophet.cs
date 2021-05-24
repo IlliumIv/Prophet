@@ -161,14 +161,14 @@ namespace Prophet
                 case "Temp SC" : 
                     uniquesUrls = new List<string>()
                     {
-                        @"https://poe.ninja/api/data/itemoverview?league=Delirium&type=Prophecy&language=en",
+                        @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
                     };
                     break;
                 
                 case "Temp HC" : 
                     uniquesUrls = new List<string>()
                     {
-                        @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Delirium&type=Prophecy&language=en",
+                        @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
                     };
                     break;
                 
