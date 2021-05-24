@@ -27,8 +27,8 @@ namespace Prophet
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
             RefreshData();
-            Settings.Refresh.OnPressed += s => { RefreshData(); };
-            Settings.League.OnValueSelectedPre += s => { RefreshData(); };
+            Settings.Refresh.OnPressed += () => { RefreshData(); };
+            Settings.League.OnValueSelectedPre += () => { RefreshData(); };
             return true;
         }
         
