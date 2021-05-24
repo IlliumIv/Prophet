@@ -33,7 +33,14 @@ namespace Prophet
             _ingameState = GameController.Game.IngameState;
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
-            Settings.League.OnValueSelectedPre += s => { Settings.Update.Value ? ParsingPoeNinja() : ReadProphecies(); };
+            Settings.League.OnValueSelectedPre += s => { 
+                if (Settings.Update.Value) {
+                    ParsingPoeNinja();
+                }
+                else {
+                    ReadProphecies();
+                }
+            };
             return true;
         }
 
