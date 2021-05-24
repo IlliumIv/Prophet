@@ -44,7 +44,7 @@ namespace Prophet
 
         public override void Render()
         {
-            if (!_ingameState.IngameUi.OpenRightPanel.IsVisible)
+            if (!_ingameState.IngameUi.OpenLeftPanel.IsVisible)
                 return;
 
             GotProphecies();
