@@ -27,14 +27,14 @@ namespace Prophet
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
             RefreshData();
-            Settings.Enable.OnValueChanged += (s,v) => { Settings.Enable.Value = v; RefreshData(); };
+            Settings.UseAPI.OnValueChanged += (s,v) => { Settings.Enable.Value = v; RefreshData(); };
             Settings.Refresh.OnPressed += () => { RefreshData(); };
             Settings.League.OnValueSelectedPre += s => { RefreshData(); };
             return true;
         }
         
         private void RefreshData() {
-            if (Settings.Update.Value) {
+            if (Settings.UseAPI.Value) {
                 ParsingPoeNinja();
             }
             else {
@@ -152,61 +152,38 @@ namespace Prophet
 
         private void ParsingPoeNinja()
         {
-            PropheciesListGood = new List<string>();
-            
-            PropheciesListTrash = new List<string>();
-            
-            if (!Settings.Update.Value)
+            if (!Settings.UseAPI.Value)
                 return;
 
             #region Parsing
-
-            List<string> uniquesUrls;
-            
-            switch (Settings.League.Value)
+            PropheciesListGood = new List<string>();
+            PropheciesListTrash = new List<string>();
+            var uniquesUrl = Settings.League.Value switch 
             {
-                case "Temp SC" : 
-                    uniquesUrls = new List<string>()
-                    {
-                        @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
-                    };
-                    break;
-                
-                case "Temp HC" : 
-                    uniquesUrls = new List<string>()
-                    {
-                        @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
-                    };
-                    break;
-                
-                default:
-                    uniquesUrls = new List<string>();
-                    break;
-            }
+                "Temp SC" -> @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en",
+                "Temp HC" => @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en",
+                _ => @"",
+            };
             
             var resultGood = new HashSet<string>();
             
             var resultTrash = new HashSet<string>();
 
-            foreach (var url in uniquesUrls)
+            using (var wc = new WebClient())
             {
-                using (var wc = new WebClient())
+                var json = wc.DownloadString(url);
+                var o = JObject.Parse(json);
+                foreach (var line in o?["lines"])
                 {
-                    var json = wc.DownloadString(url);
-                    var o = JObject.Parse(json);
-                    foreach (var line in o?["lines"])
+                    if (float.TryParse((string) line?["chaosValue"], out var chaosValue))
                     {
-                        if (float.TryParse((string) line?["chaosValue"], out var chaosValue))
+                        if (chaosValue >= Settings.ChaosValueGood.Value)
                         {
-                            if (chaosValue >= Settings.ChaosValueGood.Value)
-                            {
-                                resultGood.Add((string) line?["name"]);
-                            }
-                            
-                            if (chaosValue <= Settings.ChaosValueTrash.Value)
-                            {
-                                resultTrash.Add((string) line?["name"]);
-                            }
+                            resultGood.Add((string) line?["name"]);
+                        }
+                        else if (chaosValue <= Settings.ChaosValueTrash.Value)
+                        {
+                            resultTrash.Add((string) line?["name"]);
                         }
                     }
                 }
