@@ -27,7 +27,7 @@ namespace Prophet
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
             RefreshData();
-            Settings.UseAPI.OnValueChanged += (s,v) => { RefreshData(); };
+            //Settings.UseAPI.OnValueChanged += (s,v) => { RefreshData(); };
             Settings.Refresh.OnPressed += () => { RefreshData(); };
             Settings.League.OnValueSelectedPre += s => { RefreshData(); };
             return true;
@@ -54,7 +54,7 @@ namespace Prophet
         private void GotProphecies()
         {
             //
-            var ProphecyPanel = _ingameState.IngameUi.OpenLeftPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(40)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
+            var ProphecyPanel = _ingameState.IngameUi.OpenLeftPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(41)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
 
             if ((ProphecyPanel == null) || (!ProphecyPanel.IsVisible)) 
                 return;
