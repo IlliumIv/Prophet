@@ -23,21 +23,28 @@ namespace Prophet
 
         public override bool Initialise()
         {
-            // ReadProphecies();
-
-            ParsingPoeNinja();
-            
             _ingameState = GameController.Game.IngameState;
             _windowOffset = GameController.Window.GetWindowRectangle().TopLeft;
 
-            Settings.League.OnValueSelectedPre += s => { ParsingPoeNinja(); };
-            
+            RefreshData();
+            Settings.UseAPI.OnValueChanged += (s,v) => { RefreshData(); };
+            Settings.Refresh.OnPressed += () => { RefreshData(); };
+            Settings.League.OnValueSelectedPre += s => { RefreshData(); };
             return true;
+        }
+        
+        private void RefreshData() {
+            if (Settings.UseAPI.Value) {
+                ParsingPoeNinja();
+            }
+            else {
+                ReadProphecies();
+            }
         }
 
         public override void Render()
         {
-            if (!_ingameState.IngameUi.OpenRightPanel.IsVisible)
+            if (!_ingameState.IngameUi.OpenLeftPanel.IsVisible)
                 return;
 
             GotProphecies();
@@ -47,7 +54,7 @@ namespace Prophet
         private void GotProphecies()
         {
             //
-            var ProphecyPanel = _ingameState.IngameUi.OpenRightPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(33)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
+            var ProphecyPanel = _ingameState.IngameUi.OpenLeftPanel.GetChildAtIndex(2)?.GetChildAtIndex(0)?.GetChildAtIndex(1)?.GetChildAtIndex(1)?.GetChildAtIndex(40)?.GetChildAtIndex(0)?.GetChildAtIndex(0);
 
             if ((ProphecyPanel == null) || (!ProphecyPanel.IsVisible)) 
                 return;
@@ -142,64 +149,42 @@ namespace Prophet
                 reader.Close();
             }
         }
+        
+        private string FetchPoeNinjaURL() {
+            switch (Settings.League.Value)
+            {
+                case "Temp SC": return @"https://poe.ninja/api/data/itemoverview?league=Ultimatum&type=Prophecy&language=en";
+                case "Temp HC": return @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Ultimatum&type=Prophecy&language=en";
+                default: return "";
+            };
+         }
 
         private void ParsingPoeNinja()
         {
-            PropheciesListGood = new List<string>();
-            
-            PropheciesListTrash = new List<string>();
-            
-            if (!Settings.Update.Value)
+            if (!Settings.UseAPI.Value)
                 return;
 
             #region Parsing
-
-            List<string> uniquesUrls;
-            
-            switch (Settings.League.Value)
-            {
-                case "Temp SC" : 
-                    uniquesUrls = new List<string>()
-                    {
-                        @"https://poe.ninja/api/data/itemoverview?league=Delirium&type=Prophecy&language=en",
-                    };
-                    break;
-                
-                case "Temp HC" : 
-                    uniquesUrls = new List<string>()
-                    {
-                        @"https://poe.ninja/api/data/itemoverview?league=Hardcore%20Delirium&type=Prophecy&language=en",
-                    };
-                    break;
-                
-                default:
-                    uniquesUrls = new List<string>();
-                    break;
-            }
+            string apiURL = FetchPoeNinjaURL();
             
             var resultGood = new HashSet<string>();
-            
             var resultTrash = new HashSet<string>();
 
-            foreach (var url in uniquesUrls)
+            using (var wc = new WebClient())
             {
-                using (var wc = new WebClient())
+                var json = wc.DownloadString(apiURL);
+                var o = JObject.Parse(json);
+                foreach (var line in o?["lines"])
                 {
-                    var json = wc.DownloadString(url);
-                    var o = JObject.Parse(json);
-                    foreach (var line in o?["lines"])
+                    if (float.TryParse((string) line?["chaosValue"], out var chaosValue))
                     {
-                        if (float.TryParse((string) line?["chaosValue"], out var chaosValue))
+                        if (chaosValue >= Settings.ChaosValueGood.Value)
                         {
-                            if (chaosValue >= Settings.ChaosValueGood.Value)
-                            {
-                                resultGood.Add((string) line?["name"]);
-                            }
-                            
-                            if (chaosValue <= Settings.ChaosValueTrash.Value)
-                            {
-                                resultTrash.Add((string) line?["name"]);
-                            }
+                            resultGood.Add((string) line?["name"]);
+                        }
+                        else if (chaosValue <= Settings.ChaosValueTrash.Value)
+                        {
+                            resultTrash.Add((string) line?["name"]);
                         }
                     }
                 }
@@ -207,12 +192,10 @@ namespace Prophet
 
             var result2G = resultGood.ToList();
             result2G.Sort();
-
             PropheciesListGood = result2G;
             
             var result2T = resultTrash.ToList();
             result2T.Sort();
-            
             PropheciesListTrash = result2T;
 
             #endregion
