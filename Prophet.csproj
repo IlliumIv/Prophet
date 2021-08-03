@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ExileCore">
-      <HintPath>C:\Users\polyakov.ENT\Desktop\Файлы\github\PoeHelper\ExileCore.dll</HintPath>
+      <HintPath>..\..\..\..\PoeHelper\ExileCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib" />
